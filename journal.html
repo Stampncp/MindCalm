@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCalm - เขียนระบายความรู้สึก</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --primary-color: #048a60;
+            --primary-light: #dcfce7;
+            --bg-color: #f4fdf8;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --border-color: #e2e8f0;
+            --danger-color: #ef4444;
+            --warning-color: #eab308;
+            --warning-light: #fef9c3;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        /* --- Header --- */
+        header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: transparent;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+            flex: 1;
+        }
+
+        .back-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .header-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            text-align: center;
+        }
+
+        .header-spacer {
+            flex: 1;
+        }
+
+        /* --- Main Content Layout --- */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            align-items: start;
+        }
+
+        /* --- Left Column: New Entry --- */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+            margin-bottom: 1.5rem;
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 0.8rem;
+            color: var(--text-dark);
+        }
+
+        /* --- Mood Selection (อัปเดตใหม่) --- */
+        .mood-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mood-btn {
+            background-color: transparent;
+            border: 2px solid var(--border-color); /* เปลี่ยนเป็น 2px เพื่อไม่ให้ปุ่มขยับตอน Active */
+            border-radius: 12px;
+            padding: 1rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            color: var(--text-gray);
+            outline: none;
+        }
+
+        .mood-btn i {
+            font-size: 2rem;
+        }
+
+        .mood-btn span {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .mood-btn:hover:not(.active) {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        /* --- Active Styles --- */
+        /* 1. อารมณ์ "ดี" (Good) */
+        .mood-btn[data-mood="good"].active {
+            border-color: #22c55e;
+            background-color: #f0fdf4;
+            color: #16a34a;
+        }
+
+        /* 2. อารมณ์ "ปานกลาง" (Neutral) */
+        .mood-btn[data-mood="neutral"].active {
+            border-color: #eab308;
+            background-color: #fefce8;
+            color: #ca8a04;
+        }
+
+        /* 3. อารมณ์ "ไม่ดี" (Bad) */
+        .mood-btn[data-mood="bad"].active {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+            color: #dc2626;
+        }
+
+        /* Textarea */
+        .textarea-wrapper {
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            border: 2px solid var(--primary-light);
+            border-radius: 12px;
+            padding: 1rem;
+            font-size: 0.95rem;
+            resize: none;
+            outline: none;
+            transition: border-color 0.3s;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        textarea:focus {
+            border-color: var(--primary-color);
+        }
+
+        textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        .char-count {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            margin-top: 0.5rem;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background-color: #8bd3bb;
+            color: var(--white);
+            flex-grow: 1;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-color);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text-gray);
+            border-color: var(--border-color);
+            width: 80px;
+        }
+
+        .btn-outline:hover {
+            background-color: #f1f5f9;
+        }
+
+        /* Tips Card */
+        .tips-card {
+            background-color: var(--card-bg);
+        }
+
+        .tips-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .tips-header i {
+            color: var(--warning-color);
+            font-size: 1.25rem;
+        }
+
+        .tips-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .tips-list li {
+            position: relative;
+            padding-left: 15px;
+            margin-bottom: 0.8rem;
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+        .tips-list li::before {
+            content: "•";
+            color: var(--primary-color);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        /* --- Right Column: History --- */
+        .history-section h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .history-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s;
+        }
+
+        .history-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--bg-color);
+            padding-bottom: 0.8rem;
+        }
+
+        .history-meta {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .mood-icon-small {
+            font-size: 1.5rem;
+        }
+
+        .mood-icon-small.good { color: #22c55e; }
+        .mood-icon-small.neutral { color: var(--warning-color); }
+        .mood-icon-small.bad { color: var(--danger-color); }
+
+        .date-time {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .date-time .date {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .date-time .time {
+            font-size: 0.75rem;
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #fca5a5;
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: color 0.3s;
+        }
+
+        .delete-btn:hover {
+            color: var(--danger-color);
+        }
+
+        .history-content {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 992px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+            .header-spacer {
+                display: none;
+            }
+            header {
+                justify-content: space-between;
+            }
+            .header-title {
+                text-align: right;
+            }
+        }
+        @media (max-width: 500px) {
+            .mood-selector {
+                gap: 0.5rem;
+            }
+            .mood-btn {
+                padding: 0.8rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="dashboard.html" class="back-btn"><i class="ph ph-arrow-left"></i> กลับหน้าหลัก</a>
+        <div class="header-title">เขียนระบายความรู้สึก</div>
+        <div class="header-spacer"></div>
+    </header>
+
+    <main>
+        
+        <div class="left-column">
+            <div class="card">
+                <h2>บันทึกใหม่</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">วันนี้คุณรู้สึกอย่างไร?</label>
+                    
+                    <div class="mood-selector">
+                        <button class="mood-btn" data-mood="good">
+                            <i class="ph ph-smiley"></i>
+                            <span>ดี</span>
+                        </button>
+                        <button class="mood-btn active" data-mood="neutral">
+                            <i class="ph ph-smiley-meh"></i>
+                            <span>ปานกลาง</span>
+                        </button>
+                        <button class="mood-btn" data-mood="bad">
+                            <i class="ph ph-smiley-sad"></i>
+                            <span>ไม่ดี</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">เขียนระบายความรู้สึกของคุณ</label>
+                    <div class="textarea-wrapper">
+                        <textarea placeholder="เริ่มเขียนสิ่งที่คุณรู้สึก คิด หรือประสบในวันนี้... ไม่มีใครตัดสิน เขียนอย่างที่คุณรู้สึกได้เลย"></textarea>
+                    </div>
+                    <div class="char-count">
+                        <span>0 คำ</span>
+                        <span>0 ตัวอักษร</span>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-primary"><i class="ph ph-floppy-disk"></i> บันทึก</button>
+                    <button class="btn btn-outline">ล้าง</button>
+                </div>
+            </div>
+
+            <div class="card tips-card">
+                <div class="tips-header">
+                    <i class="ph-fill ph-lightbulb"></i>
+                    เคล็ดลับการเขียนบันทึก
+                </div>
+                <ul class="tips-list">
+                    <li>เขียนอย่างซื่อสัตย์และตรงไปตรงมา ไม่ต้องกลัวการตัดสิน</li>
+                    <li>ไม่ต้องกังวลเรื่องไวยากรณ์ หรือการเขียนที่สมบูรณ์แบบ</li>
+                    <li>เขียนเกี่ยวกับทั้งประสบการณ์ที่ดีและไม่ดี เพื่อเข้าใจตัวเองมากขึ้น</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h3>บันทึกก่อนหน้า</h3>
+            
+            <div class="history-card">
+                <div class="history-header">
+                    <div class="history-meta">
+                        <div class="mood-icon-small good">
+                            <i class="ph ph-smiley"></i>
+                        </div>
+                        <div class="date-time">
+                            <span class="date"><i class="ph ph-calendar-blank"></i> 10 เมษายน 2569</span>
+                            <span class="time"><i class="ph ph-clock"></i> 07:00</span>
+                        </div>
+                    </div>
+                    <button class="delete-btn" title="ลบบันทึก">
+                        <i class="ph ph-trash"></i>
+                    </button>
+                </div>
+                <div class="history-content">
+                    วันนี้เป็นวันที่ดี ได้ทำงานเสร็จตามเป้าหมาย รู้สึกภูมิใจในตัวเอง
+                </div>
+            </div>
+
+            <div class="history-card">
+                <div class="history-header">
+                    <div class="history-meta">
+                        <div class="mood-icon-small neutral">
+                            <i class="ph ph-smiley-meh"></i>
+                        </div>
+                        <div class="date-time">
+                            <span class="date"><i class="ph ph-calendar-blank"></i> 9 เมษายน 2569</span>
+                            <span class="time"><i class="ph ph-clock"></i> 07:00</span>
+                        </div>
+                    </div>
+                    <button class="delete-btn" title="ลบบันทึก">
+                        <i class="ph ph-trash"></i>
+                    </button>
+                </div>
+                <div class="history-content">
+                    รู้สึกเหนื่อยกับงานมาก ต้องหาเวลาพักผ่อนมากขึ้น
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // ดึงปุ่มทั้งหมดที่มีคลาส mood-btn มาเก็บไว้ในตัวแปร
+        const moodButtons = document.querySelectorAll('.mood-btn');
+
+        // วนลูปเพื่อใส่ Event Listener ให้กับทุกปุ่ม
+        moodButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // 1. ลบคลาส 'active' ออกจากทุกปุ่มก่อน
+                moodButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // 2. เพิ่มคลาส 'active' ให้กับปุ่มที่เพิ่งถูกคลิก
+                button.classList.add('active');
+            });
+        });
+    </script>
+
+</body>
+</html>

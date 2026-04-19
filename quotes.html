@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCalm - Daily Peace Quotes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --primary-color: #048a60;
+            --primary-light: #e0f8eb; /* สีเขียวอ่อนสำหรับ Tag และพื้นหลังย่อย */
+            --bg-color: #f4fdf8;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --border-color: #e2e8f0;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Simple Header --- */
+        header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: transparent; /* โปร่งใสตามดีไซน์ */
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        .back-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .header-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Spacer เพื่อดันให้ flex สมดุลกรณีมีปุ่มซ้ายแต่ไม่มีปุ่มขวา */
+        .header-spacer {
+            width: 100px; 
+        }
+
+        /* --- Main Content --- */
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem 5rem;
+            gap: 1.5rem;
+        }
+
+        .content-wrapper {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* --- Quote Card --- */
+        .quote-card {
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            padding: 4rem 3rem 3rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .icon-top {
+            background-color: var(--primary-color);
+            color: var(--white);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            position: absolute;
+            top: -25px; /* ดันขึ้นไปครึ่งหนึ่งของวงกลม */
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 8px 20px rgba(4, 138, 96, 0.2);
+        }
+
+        .quote-text {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        .quote-author {
+            color: var(--text-gray);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .category-tag {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 2.5rem;
+            display: inline-block;
+        }
+
+        /* --- Action Buttons --- */
+        .quote-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: #03704d;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+        }
+
+        /* --- Practice Card --- */
+        .practice-card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+        }
+
+        .practice-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .practice-header i {
+            color: #eab308; /* สีเหลืองหลอดไฟ */
+            font-size: 1.4rem;
+        }
+
+        .practice-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .practice-desc {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .technique-box {
+            background-color: var(--primary-light);
+            border-radius: 12px;
+            padding: 1.2rem;
+            display: flex;
+            gap: 15px;
+        }
+
+        .technique-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .technique-content h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.2rem;
+        }
+
+        .technique-content p {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .quote-text {
+                font-size: 1.5rem;
+            }
+            .quote-card {
+                padding: 3rem 1.5rem 2rem;
+            }
+            .header-title {
+                position: static;
+                transform: none;
+            }
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            .header-spacer {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="dashboard.html" class="back-btn"><i class="ph ph-arrow-left"></i> กลับหน้าหลัก</a>
+        <div class="header-title">Daily Peace Quotes</div>
+        <div class="header-spacer"></div>
+    </header>
+
+    <main>
+        <div class="content-wrapper">
+            
+            <div class="quote-card">
+                <div class="icon-top">
+                    <i class="ph-fill ph-sparkle"></i>
+                </div>
+                
+                <h2 class="quote-text">"ความสุขไม่ได้อยู่ที่การไม่มีปัญหา แต่อยู่ที่ความสามารถในการรับมือกับมัน"</h2>
+                <p class="quote-author">— Steve Maraboli</p>
+                
+                <div class="category-tag">ความสุข</div>
+                
+                <div class="quote-actions">
+                    <button class="btn btn-primary">
+                        <i class="ph ph-arrows-clockwise"></i> คำคมใหม่
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="ph ph-heart"></i> ถูกใจ
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="ph ph-share-network"></i> แชร์
+                    </button>
+                </div>
+            </div>
+
+            <div class="practice-card">
+                <div class="practice-header">
+                    <i class="ph-fill ph-lightbulb"></i>
+                    <h3>แนวทางการฝึกฝนวันนี้</h3>
+                </div>
+                <p class="practice-desc">
+                    ลองนำคำคมนี้ไปใช้ในชีวิตประจำวันของคุณ ให้เวลาตัวเอง 5 นาที เพื่อครุ่นคิดถึงความหมาย และดูว่ามันสามารถนำมาประยุกต์ใช้กับสถานการณ์ในชีวิตของคุณได้อย่างไร
+                </p>
+                
+                <div class="technique-box">
+                    <div class="technique-icon">
+                        <i class="ph-fill ph-person-simple-lotus"></i>
+                    </div>
+                    <div class="technique-content">
+                        <h4>เทคนิค: การฝึกสติกับคำคม</h4>
+                        <p>หลับตา หายใจเข้าลึกๆ 3 ครั้ง จากนั้นพูดคำคมนี้กับตัวเองอย่างช้าๆ สัมผัสกับอารมณ์และความรู้สึกที่เกิดขึ้น</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+</html>

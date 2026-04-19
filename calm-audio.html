@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCalm - Calm Audio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --primary-color: #048a60;
+            --primary-hover: #036b4b;
+            --bg-color: #f4fdf8;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --border-color: #e2e8f0;
+            
+            /* Tag Colors */
+            --tag-nature-bg: #dcfce7;
+            --tag-nature-text: #16a34a;
+            --tag-meditation-bg: #fef3c7;
+            --tag-meditation-text: #d97706;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        /* --- Header --- */
+        header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: transparent;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+            flex: 1;
+        }
+
+        .back-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .header-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            text-align: center;
+        }
+
+        .header-spacer {
+            flex: 1;
+        }
+
+        /* --- Main Content --- */
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1rem 2rem 4rem;
+        }
+
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        /* --- Audio Grid --- */
+        .audio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .audio-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .audio-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .audio-card.active-card {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(4, 138, 96, 0.1);
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .icon-box.rain { background: #e0f2fe; color: #0284c7; }
+        .icon-box.ocean { background: #ccfbf1; color: #0d9488; }
+        .icon-box.forest { background: #dcfce7; color: #16a34a; }
+        .icon-box.meditation { background: #ffedd5; color: #ea580c; }
+        .icon-box.wind { background: #f1f5f9; color: #64748b; }
+        .icon-box.forest-rain { background: #ede9fe; color: #7c3aed; }
+        .icon-box.river { background: #dbeafe; color: #2563eb; }
+        .icon-box.relax { background: #fae8ff; color: #c026d3; }
+
+        .audio-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .audio-info p {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            min-height: 2.8em;
+        }
+
+        .audio-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            font-size: 0.8rem;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .tag.nature {
+            background-color: var(--tag-nature-bg);
+            color: var(--tag-nature-text);
+        }
+
+        .tag.meditation {
+            background-color: var(--tag-meditation-bg);
+            color: var(--tag-meditation-text);
+        }
+
+        .duration {
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .play-btn {
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: white;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .play-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .play-btn.playing {
+            background-color: #ef4444; /* เปลี่ยนเป็นสีแดงเมื่อกดหยุด */
+        }
+        
+        .play-btn.playing:hover {
+            background-color: #dc2626;
+        }
+
+        /* --- Tips Section --- */
+        .tips-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        }
+
+        .tips-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        .tips-header i {
+            color: var(--warning-color, #eab308);
+            font-size: 1.25rem;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem 3rem;
+        }
+
+        .tip-item h4 {
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 0.4rem;
+        }
+
+        .tip-item h4 i {
+            color: var(--text-gray);
+        }
+
+        .tip-item p {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tips-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .header-spacer {
+                display: none;
+            }
+            header {
+                justify-content: space-between;
+            }
+            .header-title {
+                text-align: right;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="back-btn"><i class="ph ph-arrow-left"></i> กลับหน้าหลัก</a>
+        <div class="header-title">Calm Audio</div>
+        <div class="header-spacer"></div>
+    </header>
+
+    <main>
+        <div class="page-title">คลังเสียงผ่อนคลาย</div>
+
+        <div class="audio-grid">
+            <div class="audio-card">
+                <div class="icon-box rain"><i class="ph-fill ph-cloud-rain"></i></div>
+                <div class="audio-info">
+                    <h3>เสียงฝนตก</h3>
+                    <p>เสียงฝนตกอย่างสงบ ช่วยผ่อนคลายและนอนหลับ</p>
+                </div>
+                <div class="audio-meta">
+                    <span class="tag nature">ธรรมชาติ</span>
+                    <span class="duration"><i class="ph ph-clock"></i> 30:00</span>
+                </div>
+                <button class="play-btn" data-audio="https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg">
+                    <i class="ph-fill ph-play"></i> <span>ฟังเสียง</span>
+                </button>
+            </div>
+
+            <div class="audio-card">
+                <div class="icon-box ocean"><i class="ph-fill ph-waves"></i></div>
+                <div class="audio-info">
+                    <h3>คลื่นทะเล</h3>
+                    <p>เสียงคลื่นซัดฝั่งอย่างนุ่มนวล สร้างความสงบ</p>
+                </div>
+                <div class="audio-meta">
+                    <span class="tag nature">ธรรมชาติ</span>
+                    <span class="duration"><i class="ph ph-clock"></i> 45:00</span>
+                </div>
+                <button class="play-btn" data-audio="https://actions.google.com/sounds/v1/water/ocean_waves_crashing.ogg">
+                    <i class="ph-fill ph-play"></i> <span>ฟังเสียง</span>
+                </button>
+            </div>
+
+            <div class="audio-card">
+                <div class="icon-box forest"><i class="ph-fill ph-tree-evergreen"></i></div>
+                <div class="audio-info">
+                    <h3>ป่าในยามเช้า</h3>
+                    <p>เสียงนกร้องและธรรมชาติในป่า ให้พลังบวก</p>
+                </div>
+                <div class="audio-meta">
+                    <span class="tag nature">ธรรมชาติ</span>
+                    <span class="duration"><i class="ph ph-clock"></i> 25:00</span>
+                </div>
+                <button class="play-btn" data-audio="https://actions.google.com/sounds/v1/nature/forest_morning_with_birds.ogg">
+                    <i class="ph-fill ph-play"></i> <span>ฟังเสียง</span>
+                </button>
+            </div>
+
+            <div class="audio-card">
+                <div class="icon-box meditation"><i class="ph-fill ph-person-simple-meditate"></i></div>
+                <div class="audio-info">
+                    <h3>ท่าสมาธิพื้นฐาน</h3>
+                    <p>คลื่นเสียงช่วยในการทำสมาธิและมีสติ</p>
+                </div>
+                <div class="audio-meta">
+                    <span class="tag meditation">สมาธิ</span>
+                    <span class="duration"><i class="ph ph-clock"></i> 15:00</span>
+                </div>
+                <button class="play-btn" data-audio="https://actions.google.com/sounds/v1/science_fiction/ambient_hum_with_electric_buzz.ogg">
+                    <i class="ph-fill ph-play"></i> <span>ฟังเสียง</span>
+                </button>
+            </div>
+
+            <div class="audio-card">
+                <div class="icon-box wind"><i class="ph-fill ph-wind"></i></div>
+                <div class="audio-info">
+                    <h3>ลมพัดผ่านใบไม้</h3>
+                    <p>เสียงลมพัดผ่านต้นไม้ สร้างความรู้สึกสบาย</p>
+                </div>
+                <div class="audio-meta">
+                    <span class="tag nature">ธรรมชาติ</span>
+                    <span class="duration"><i class="ph ph-clock"></i> 20:00</span>
+                </div>
+                <button class="play-btn" data-audio="https://actions.google.com/sounds/v1/weather/strong_wind.ogg">
+                    <i class="ph-fill ph-play"></i> <span>ฟังเสียง</span>
+                </button>
+            </div>
+
+            <div class="audio-card">
+                <div class="icon-box river"><i class="ph-fill ph-drop"></i></div>
+                <div class="audio-info">
+                    <h3>ธารน้ำไหล</h3>
+                    <p>เสียงน้ำไหลเบาๆ ช่วยให้จิตใจสงบ</p>
+                </div>
+                <div class="audio-meta">
+                    <span class="tag nature">ธรรมชาติ</span>
+                    <span class="duration"><i class="ph ph-clock"></i> 35:00</span>
+                </div>
+                <button class="play-btn" data-audio="https://actions.google.com/sounds/v1/water/river_flow.ogg">
+                    <i class="ph-fill ph-play"></i> <span>ฟังเสียง</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="tips-section">
+            <div class="tips-header">
+                <i class="ph-fill ph-lightbulb"></i> เคล็ดลับการฟัง
+            </div>
+            <div class="tips-grid">
+                <div class="tip-item">
+                    <h4><i class="ph ph-headphones"></i> สวมหูฟัง</h4>
+                    <p>การใส่หูฟังจะช่วยให้คุณได้รับรายละเอียดของเสียงและดื่มด่ำกับประสบการณ์มากขึ้น</p>
+                </div>
+                <div class="tip-item">
+                    <h4><i class="ph ph-timer"></i> ตั้งเวลา</h4>
+                    <p>แนะนำให้ฟังอย่างน้อย 10-15 นาที เพื่อให้ร่างกายและจิตใจผ่อนคลายอย่างแท้จริง</p>
+                </div>
+                <div class="tip-item">
+                    <h4><i class="ph ph-eye-closed"></i> หลับตา</h4>
+                    <p>การหลับตาจะช่วยตัดสิ่งเร้าทางการมองเห็นและทำให้คุณมีสมาธิกับเสียงมากขึ้น</p>
+                </div>
+                <div class="tip-item">
+                    <h4><i class="ph ph-moon-stars"></i> เวลาที่เหมาะสม</h4>
+                    <p>เหมาะสำหรับฟังก่อนนอน หรือเมื่อรู้สึกเครียดและต้องการผ่อนคลาย</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ระบบจัดการการเล่นเสียง
+        const playButtons = document.querySelectorAll('.play-btn');
+        let currentAudio = null;
+        let currentButton = null;
+
+        playButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const audioUrl = this.getAttribute('data-audio');
+                const card = this.closest('.audio-card');
+                
+                // กรณีคลิกปุ่มเดิมที่กำลังเล่นอยู่ (Pause)
+                if (currentButton === this && currentAudio) {
+                    if (!currentAudio.paused) {
+                        currentAudio.pause();
+                        setButtonState(this, card, false);
+                    } else {
+                        currentAudio.play();
+                        setButtonState(this, card, true);
+                    }
+                    return;
+                }
+
+                // กรณีมีเสียงอื่นเล่นอยู่ ให้หยุดเสียงเดิมก่อน
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0; // รีเซ็ตเวลา
+                    setButtonState(currentButton, currentButton.closest('.audio-card'), false);
+                }
+
+                // เริ่มเล่นเสียงใหม่
+                currentAudio = new Audio(audioUrl);
+                currentAudio.loop = true; // ให้เล่นวนซ้ำ
+                currentAudio.play().catch(error => {
+                    console.log("Audio play failed:", error);
+                    alert("ไม่สามารถเล่นไฟล์เสียงได้ในขณะนี้");
+                });
+
+                currentButton = this;
+                setButtonState(this, card, true);
+            });
+        });
+
+        // ฟังก์ชันเปลี่ยน UI ของปุ่มเมื่อกดเล่น/หยุด
+        function setButtonState(button, card, isPlaying) {
+            const icon = button.querySelector('i');
+            const text = button.querySelector('span');
+
+            if (isPlaying) {
+                button.classList.add('playing');
+                card.classList.add('active-card');
+                icon.className = 'ph-fill ph-pause';
+                text.textContent = 'หยุดพัก';
+            } else {
+                button.classList.remove('playing');
+                card.classList.remove('active-card');
+                icon.className = 'ph-fill ph-play';
+                text.textContent = 'ฟังเสียง';
+            }
+        }
+    </script>
+</body>
+</html>
